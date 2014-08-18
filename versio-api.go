@@ -2,14 +2,13 @@
 package versio
 
 import (
-"net/http"
-"fmt"
-"strings"
-"net/url"
-"bytes"
-"mime/multipart"
-"io/ioutil"
-"errors"
+	"net/http"
+	"strings"
+	"net/url"
+	"bytes"
+	"mime/multipart"
+	"io/ioutil"
+	"errors"
 )
 
 var klantNr 	string
