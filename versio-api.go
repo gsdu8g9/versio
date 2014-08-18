@@ -33,7 +33,7 @@ func Initialize(ClientNumber, ClientPassword string, SandboxMode bool) {
 func SendWithChannel(CommandParameters url.Values, ch chan *map[string]string) {
 	output, err := Send(CommandParameters)
 	if err != nil {
-		CommandParameters(err)
+		panic(err)
 	} else {
 		ch <- output
 	}
