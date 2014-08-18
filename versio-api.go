@@ -1,20 +1,25 @@
 package versio
 
 import (
-	"fmt"
-	"strings"
-	"net/url"
-	"bytes"
-	"mime/multipart"
+"net/http"
+"fmt"
+"strings"
+"net/url"
+"bytes"
+"mime/multipart"
+"io/ioutil"
+"errors"
 )
 
-var klantNr 	= "64349"
-var klantPass 	= "d4f041bea55ae1524318386b607995112589983d"
-var sandBox 	= "1"
+var klantNr 	string
+var klantPass 	string
+var sandBox 	string
+var initialized bool
 var apiUrl		= "https://www.secure.versio.nl/api/api_server.php"
 
 // Initialize sets the required variables (i.e. Password) for the Versio-API authentication. The password has to be SHA1-hashed already.
 func Initialize(nr, pw string, sand bool) {
+	initialized = true
 	klantNr = nr
 	klantPass = pw
 	if sand {
@@ -24,51 +29,62 @@ func Initialize(nr, pw string, sand bool) {
 	}
 }
 
-func search(domain, tld string) {
+// Send with channel is similar to 'Send', but sends the return-value to the given channel instead. Panics on error. 
+func SendWithChannel(params url.Values, ch chan *map[string]string) {
+	output, err := Send(params)
+	if err != nil {
+		panic(err)
+	} else {
+		ch <- output
+	}
+}
 
+// Send creates a POST-request for the given values to the API server. Returns the response as a map with keys such as 'success'. 
+func Send(params url.Values) (*map[string]string, error) {
+	if !initialized {
+		return nil, errors.New("Must call versio.Initialize first. ")
+	}
 	// Set POST data
 	data := url.Values{}
-	data.Set("command",	"DomainsCheckAvailability")
-	data.Set("domain", 	domain)
-	data.Set("tld",		tld)
 	data.Set("klantPw", klantPass)
 	data.Set("klantId", klantNr)
 	data.Set("sandBox", sandBox)
-
+	
 	// Write POST-data to Multipart/Form-Data
 	Mb := &bytes.Buffer{}
 	Mw := multipart.NewWriter(Mb)
 	for key, val := range data {
-		err := Mw.WriteField(key, val[0])
-		if err != nil {
-			fmt.Println(&Mb, &Mw, err)
-		}
-	} 
+		Mw.WriteField(key, val[0])
+	}
+	for key, val := range params {
+		Mw.WriteField(key, val[0])
+	}
 	Mw.Close()
+	// Save boundary for Content-Type
 	boundary := Mw.Boundary()
-	
 	
 	// Prepare client and request
 	client := &http.Client{}
-	r, _ := http.NewRequest("POST", apiUrl, Mb)
-	r.Close = true
+	r, err := http.NewRequest("POST", apiUrl, Mb)
+	if err != nil {
+		return nil, err
+	}
+	r.Close = true	// Connection: Close
 	r.Header.Set("Expect", "100-continue")
 	r.Header.Set("Content-Type", "multipart/form-data; boundary=" + boundary)
 	
 	// Do request and parse results
-	resp, _ := client.Do(r)
-	contents, _ := ioutil.ReadAll(resp.Body)
-	mapped := contentToMap(contents)
-	
-	// Return results to channel
-	if mapped["success"] == "0" {
-	dbg.Print(dbg.ERROR, time.Now().String(), "Domain-check", domain, tld, mapped)
+	if resp, err := client.Do(r); err != nil {
+		return nil, err
+	} else {
+		if contents, err := ioutil.ReadAll(resp.Body); err != nil {
+			return nil, err
+		} else {
+			mapped := contentToMap(contents)
+			return &mapped, nil
+		}
 	}
-	avail := mapped["success"] == "1" && mapped["status"] == "1"
-	result := &searchResult{domain + "." + tld, avail}
-	cache[domain + "." + tld] = searchQuery{time.Now(), avail}
-	
-	}
+}
 
 func contentToMap(content []byte) map[string]string {
 	returnable := make(map[string]string)
