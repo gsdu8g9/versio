@@ -23,8 +23,8 @@ data.Set("domain", 	    "example")
 data.Set("tld",	        "com")
 
 // Actually making request
-mapped, error := versio.Send(data)
-if error != nil {
+mapped, err := versio.Send(data)
+if err != nil {
 	// error handling ...
 }
 
