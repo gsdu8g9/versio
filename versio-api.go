@@ -30,7 +30,7 @@ func Initialize(ClientNumber, ClientPassword string, SandboxMode bool) {
 }
 
 // Send with channel is similar to 'Send', but sends the return-value to the given channel instead. Panics on error. 
-func SendWithChannel(CommandParameters url.Values, ch chan *map[string]string) {
+func SendWithChannel(CommandParameters url.Values, ch chan map[string]string) {
 	output, err := Send(CommandParameters)
 	if err != nil {
 		panic(err)
@@ -40,7 +40,7 @@ func SendWithChannel(CommandParameters url.Values, ch chan *map[string]string) {
 }
 
 // Send creates a POST-request for the given values to the API server. Returns the response as a map with keys such as 'success'. 
-func Send(CommandParameters url.Values) (*map[string]string, error) {
+func Send(CommandParameters url.Values) (map[string]string, error) {
 	if !initialized {
 		return nil, errors.New("Must call versio.Initialize first. ")
 	}
@@ -81,7 +81,7 @@ func Send(CommandParameters url.Values) (*map[string]string, error) {
 			return nil, err
 		} else {
 			mapped := contentToMap(contents)
-			return &mapped, nil
+			return mapped, nil
 		}
 	}
 }
