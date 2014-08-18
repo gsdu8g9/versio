@@ -12,6 +12,7 @@ import (
     "github.com/HuperWebs/versio"
 )
 
+...
 
 // One time: initialization
 versio.Initialize("12345", "de9f2c7fd25e1b3afad3e85a0bd17d9b100db4b3", false)
