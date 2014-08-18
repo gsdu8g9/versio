@@ -1,3 +1,4 @@
+// Package versio allows access to the Versio-API. 
 package versio
 
 import (
@@ -18,11 +19,11 @@ var initialized bool
 var apiUrl		= "https://www.secure.versio.nl/api/api_server.php"
 
 // Initialize sets the required variables (i.e. Password) for the Versio-API authentication. The password has to be SHA1-hashed already.
-func Initialize(nr, pw string, sand bool) {
+func Initialize(ClientNumber, ClientPassword string, SandboxMode bool) {
 	initialized = true
-	klantNr = nr
-	klantPass = pw
-	if sand {
+	klantNr = ClientNumber
+	klantPass = ClientPassword
+	if SandboxMode {
 		sandBox = "1"
 	} else {
 		sandBox = "0"
@@ -30,17 +31,17 @@ func Initialize(nr, pw string, sand bool) {
 }
 
 // Send with channel is similar to 'Send', but sends the return-value to the given channel instead. Panics on error. 
-func SendWithChannel(params url.Values, ch chan *map[string]string) {
-	output, err := Send(params)
+func SendWithChannel(CommandParameters url.Values, ch chan *map[string]string) {
+	output, err := Send(CommandParameters)
 	if err != nil {
-		panic(err)
+		CommandParameters(err)
 	} else {
 		ch <- output
 	}
 }
 
 // Send creates a POST-request for the given values to the API server. Returns the response as a map with keys such as 'success'. 
-func Send(params url.Values) (*map[string]string, error) {
+func Send(CommandParameters url.Values) (*map[string]string, error) {
 	if !initialized {
 		return nil, errors.New("Must call versio.Initialize first. ")
 	}
@@ -56,7 +57,7 @@ func Send(params url.Values) (*map[string]string, error) {
 	for key, val := range data {
 		Mw.WriteField(key, val[0])
 	}
-	for key, val := range params {
+	for key, val := range CommandParameters {
 		Mw.WriteField(key, val[0])
 	}
 	Mw.Close()
