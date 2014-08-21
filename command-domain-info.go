@@ -2,9 +2,6 @@ package versio
 
 import "net/url"
 
-import (
-)
-
 // DomainsTLDInfo retrieves a list of available extensions (pricing included). If tld is nil, all extensions will be checked.
 func DomainsTLDInfo (tld string) (map[string]string, error) {
 	data := url.Values{}
