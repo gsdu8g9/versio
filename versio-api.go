@@ -41,7 +41,7 @@ func SendWithChannel(CommandParameters url.Values, ch chan map[string]string) {
 
 // Send creates a POST-request for the given values to the API server. Returns the response as a map with keys such as 'success'. 
 func Send(CommandParameters url.Values) (map[string]string, error) {
-	if !initialized() {
+	if !initialized {
 		return nil, errors.New("Must call versio.Initialize first. ")
 	}
 	// Set POST data
