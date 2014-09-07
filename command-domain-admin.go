@@ -52,7 +52,7 @@ func DomainsDNSListRedirections (domain, tld string) (map[string]string, error) 
 }
 
 
-// DomainsDNSAddRecord adds a new DNS record for the domain
+// DomainsDNSAddRecord adds a new DNS record for the domain. Any prio-value <= 0 will omit the optional prio-parameter. 
 func DomainsDNSAddRecord (domain, tld, name string, recordType RecordType, value string, prio int, ttl TTLValue) (map[string]string, error) {
 	data := url.Values{}
 	data.Add("command", "DomainsDNSAddRecord")
@@ -61,7 +61,9 @@ func DomainsDNSAddRecord (domain, tld, name string, recordType RecordType, value
 	data.Add("name", name)
 	data.Add("type", recordType.String())
 	data.add("value", value)
-	data.add("prio", strconv.Itoa(prio))
+	if prio > 0 {
+		data.add("prio", strconv.Itoa(prio))
+	}
 	data.add("ttl", ttl.String())
 	return Send(data)
 }

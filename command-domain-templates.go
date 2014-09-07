@@ -36,7 +36,7 @@ func DNSTemplatesCreate (template_name string) (map[string]string, error) {
 	return Send(data)
 }
 
-// DNSTemplateAddRecord adds a new DNS record for the given template
+// DNSTemplateAddRecord adds a new DNS record for the given template. Any prio-value <= 0 will omit the optional prio-parameter. 
 func DNSTemplateAddRecord (template_id int, name string, rtype RecordType, value string, prio int, ttl TTLValue) (map[string]string, error) {
 	data := url.Values{}
 	data.Add("command", "DNSTemplateAddRecord")
@@ -44,7 +44,9 @@ func DNSTemplateAddRecord (template_id int, name string, rtype RecordType, value
 	data.Add("name", name)
 	data.Add("type", rtype.String())
 	data.Add("value", value)
-	data.Add("prio", strconv.Itoa(prio))
+	if prio > 0 {
+		data.Add("prio", strconv.Itoa(prio))
+	}
 	data.Add("ttl", ttl.String())
 	return Send(data)
 }
