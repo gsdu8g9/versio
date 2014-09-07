@@ -6,7 +6,7 @@ import "net/url"
 func DomainsTLDInfo (tld string) (map[string]string, error) {
 	data := url.Values{}
 	data.Add("command", "DomainsTLDInfo")
-	if tld != "" {
+	if len(tld) > 0 {
 		data.Add("tld", tld)
 	}
 	return Send(data)

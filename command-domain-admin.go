@@ -59,12 +59,12 @@ func DomainsDNSAddRecord (domain, tld, name string, recordType RecordType, value
 	data.Add("domain", domain)
 	data.Add("tld", tld)
 	data.Add("name", name)
-	data.Add("type", recordType.String())
-	data.add("value", value)
+	data.Add("type", string(recordType))
+	data.Add("value", value)
 	if prio > 0 {
-		data.add("prio", strconv.Itoa(prio))
+		data.Add("prio", strconv.Itoa(prio))
 	}
-	data.add("ttl", ttl.String())
+	data.Add("ttl", string(ttl))
 	return Send(data)
 }
 
