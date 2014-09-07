@@ -47,7 +47,7 @@ func DNSTemplateAddRecord (template_id int, name string, rtype RecordType, value
 	if prio > 0 {
 		data.Add("prio", strconv.Itoa(prio))
 	}
-	data.Add("ttl", string(ttl.String))
+	data.Add("ttl", string(ttl))
 	return Send(data)
 }
 
