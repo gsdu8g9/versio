@@ -48,6 +48,8 @@ if err != nil {
 
 Documentation
 -------------
-Documentation of the Golang implementation is available at http://godoc.org/github.com/HuperWebs/versio
+Documentation of the Golang implementation is available at https://godoc.org/github.com/HuperWebs/versio
+
+[![GoDoc](https://godoc.org/github.com/HuperWebs/versio?status.svg)](https://godoc.org/github.com/HuperWebs/versio)
 
 Documentation of the Versio API is available in the PHP-version download at http://www.versio.nl/api.php
